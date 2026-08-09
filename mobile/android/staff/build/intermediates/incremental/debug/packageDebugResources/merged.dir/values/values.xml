@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#0F172A</color>
+    <string name="app_name">Bahuchar Staff</string>
+    <style name="Theme.BahucharStaff" parent="android:Theme.Material.NoActionBar"/>
+</resources>

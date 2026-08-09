@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreBikeRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'brand' => ['required', 'string', 'max:255'],
+            'model' => ['nullable', 'string', 'max:255'],
+            'registration_number' => ['required', 'string', 'max:50'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'registration_number.required' => 'Please enter the bike registration number.',
+        ];
+    }
+}

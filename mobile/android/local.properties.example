@@ -1,0 +1,15 @@
+## Copy this file to local.properties and adjust paths for your machine.
+## Android Studio usually creates local.properties automatically on first open.
+
+sdk.dir=C\:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
+
+# --- API (Laravel Herd backend) ---
+# Emulator (default): 10.0.2.2 = your PC localhost. Host header routes to Herd vhost.
+api.base.url=http://10.0.2.2/api/v1/
+api.host.header=bahuchar-bike-care.test
+
+# Physical phone on same Wi-Fi: use your PC LAN IP instead of 10.0.2.2
+# api.base.url=http://192.168.1.5/api/v1/
+# api.host.header=bahuchar-bike-care.test
+
+# Production release: set in staff/build.gradle.kts and customer/build.gradle.kts release block

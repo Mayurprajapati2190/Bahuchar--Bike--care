@@ -1,0 +1,2 @@
+-keepattributes *Annotation*
+-keep class com.bahuchar.bikecare.core.data.model.** { *; }
