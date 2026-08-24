@@ -8,11 +8,7 @@ use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\ServiceRecordController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : app(MarketingController::class)->home();
-})->name('home');
+Route::get('/', [MarketingController::class, 'home'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');

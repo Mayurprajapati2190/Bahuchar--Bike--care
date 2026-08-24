@@ -8,13 +8,16 @@ use App\Http\Requests\StoreServiceRecordRequest;
 use App\Http\Requests\UpdateServiceRecordRequest;
 use App\Http\Resources\BillResource;
 use App\Http\Resources\ServiceRecordResource;
+use App\Jobs\SendServiceConfirmationEmail;
 use App\Jobs\SendServiceConfirmationSms;
+use App\Jobs\SendServiceReminderEmail;
 use App\Jobs\SendServiceReminderSms;
 use App\Models\Bill;
 use App\Models\Customer;
 use App\Models\ServiceRecord;
 use App\Services\Billing\BillGenerator;
 use App\Services\Billing\ServiceItemSync;
+use App\Support\CustomerMessagingStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -100,6 +103,7 @@ class ServiceRecordController extends Controller
         $paymentStatus = $request->input('payment_status', Bill::PAYMENT_PAID);
 
         $service->markCompleted();
+        $service->load('customer');
         $bill = $this->billGenerator->createForService(
             $service,
             $paymentStatus,
@@ -110,13 +114,15 @@ class ServiceRecordController extends Controller
             SendServiceConfirmationSms::dispatch($service->id);
         }
 
-        $smsNote = config('services.msg91.enabled')
-            ? 'Confirmation SMS queued.'
-            : 'Confirmation message recorded (free mode — not sent to phone).';
+        if ($service->confirmation_email_sent_at === null) {
+            SendServiceConfirmationEmail::dispatch($service->id);
+        }
+
+        $note = CustomerMessagingStatus::completionNote(filled($service->customer->email));
 
         $message = $bill->isPending()
-            ? "Service completed. Bill {$bill->bill_number} created (payment pending). {$smsNote}"
-            : "Service completed. Bill {$bill->bill_number} created. {$smsNote}";
+            ? "Service completed. Bill {$bill->bill_number} created (payment pending). {$note}"
+            : "Service completed. Bill {$bill->bill_number} created. {$note}";
 
         return response()->json([
             'message' => $message,
@@ -129,11 +135,12 @@ class ServiceRecordController extends Controller
     {
         abort_unless($service->isCompleted(), 403, 'Reminders can only be sent for completed services.');
 
-        SendServiceReminderSms::dispatch($service->id, force: true);
+        $service->load('customer');
 
-        $status = config('services.msg91.enabled')
-            ? 'Reminder SMS queued.'
-            : 'Reminder message recorded (free mode — not sent to phone).';
+        SendServiceReminderSms::dispatch($service->id, force: true);
+        SendServiceReminderEmail::dispatch($service->id, force: true);
+
+        $status = CustomerMessagingStatus::reminderNote(filled($service->customer->email));
 
         return response()->json(['message' => $status]);
     }

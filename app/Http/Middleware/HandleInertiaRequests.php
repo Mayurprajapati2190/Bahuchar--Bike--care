@@ -62,6 +62,9 @@ class HandleInertiaRequests extends Middleware
             'notifications' => [
                 'smsLive' => (bool) config('services.msg91.enabled'),
                 'smsMode' => config('services.msg91.enabled') ? 'live' : 'free',
+                'emailEnabled' => (bool) config('messaging.email.enabled'),
+                'emailLive' => config('mail.default') !== 'log',
+                'whatsappEnabled' => (bool) config('messaging.whatsapp.enabled'),
             ],
             'shop' => fn () => [
                 'name' => config('shop.name'),

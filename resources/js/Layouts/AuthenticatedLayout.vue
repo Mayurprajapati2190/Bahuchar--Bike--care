@@ -7,7 +7,9 @@ import FlashMessage from '@/Components/FlashMessage.vue';
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const pending = computed(() => page.props.pendingPayments ?? { count: 0, amount: 0 });
-const smsFreeMode = computed(() => page.props.notifications?.smsMode === 'free');
+const messagingFreeMode = computed(
+    () => page.props.notifications?.smsMode === 'free' || !page.props.notifications?.emailLive,
+);
 
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: '⌂' },
@@ -41,7 +43,7 @@ const formatCurrency = (value) =>
                     <AppLogo />
                     <p class="mt-4 text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">Bahuchar Bike Care</p>
                     <p class="mt-1 text-xl font-bold text-white">Garage Manager</p>
-                    <p v-if="smsFreeMode" class="mt-2 text-xs text-sky-400">SMS · free mode</p>
+                    <p v-if="messagingFreeMode" class="mt-2 text-xs text-sky-400">Messaging · free mode</p>
                 </div>
 
                 <nav class="space-y-1 px-3 py-4">

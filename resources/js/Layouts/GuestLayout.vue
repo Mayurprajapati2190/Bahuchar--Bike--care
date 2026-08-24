@@ -1,5 +1,6 @@
 <script setup>
 import AppLogo from '@/Components/AppLogo.vue';
+import { Link } from '@inertiajs/vue3';
 
 defineProps({
     title: {
@@ -13,7 +14,9 @@ defineProps({
     <div class="min-h-screen bg-slate-950 text-slate-100">
         <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
             <div class="mb-8 flex flex-col items-center text-center">
-                <AppLogo icon-class="h-14 w-14" />
+                <Link href="/">
+                    <AppLogo icon-class="h-14 w-14" />
+                </Link>
                 <p class="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-amber-400">
                     Bahuchar Bike Care
                 </p>

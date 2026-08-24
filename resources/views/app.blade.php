@@ -6,7 +6,7 @@
         <meta name="theme-color" content="#020617">
         <link rel="icon" href="/logo-icon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/pwa-icon.svg">
-        <meta name="description" content="Bahuchar Bike Care — professional two-wheeler garage management software">
+        <meta name="description" content="Bahuchar Bike Care — two-wheeler service in Gota, Ahmedabad">
         <link rel="manifest" href="/build/manifest.webmanifest">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

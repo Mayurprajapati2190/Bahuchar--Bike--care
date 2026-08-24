@@ -21,7 +21,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'work_done',
     'status',
     'confirmation_sms_sent_at',
+    'confirmation_email_sent_at',
     'reminder_sms_sent_at',
+    'reminder_email_sent_at',
 ])]
 class ServiceRecord extends Model
 {
@@ -40,7 +42,9 @@ class ServiceRecord extends Model
             'next_service_due_at' => 'date',
             'total_amount' => 'decimal:2',
             'confirmation_sms_sent_at' => 'datetime',
+            'confirmation_email_sent_at' => 'datetime',
             'reminder_sms_sent_at' => 'datetime',
+            'reminder_email_sent_at' => 'datetime',
         ];
     }
 

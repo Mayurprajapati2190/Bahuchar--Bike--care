@@ -65,11 +65,11 @@ const submit = () => {
             </button>
 
             <div class="flex items-center justify-between text-sm">
+                <Link href="/" class="text-slate-400 hover:text-white">
+                    ← Back to website
+                </Link>
                 <Link href="/forgot-password" class="text-amber-400 hover:text-amber-300">
                     Forgot password?
-                </Link>
-                <Link href="/register" class="text-slate-400 hover:text-white">
-                    Create account
                 </Link>
             </div>
         </form>

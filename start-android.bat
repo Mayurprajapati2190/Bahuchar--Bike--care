@@ -26,6 +26,14 @@ if errorlevel 1 (
     set "STUDIO=studio64.exe"
 )
 
+tasklist /FI "IMAGENAME eq Herd.exe" | find /I "Herd.exe" >nul
+if errorlevel 1 (
+    if exist "%ProgramFiles%\Herd\Herd.exe" (
+        echo Starting Laravel Herd for the API...
+        start "" "%ProgramFiles%\Herd\Herd.exe"
+    )
+)
+
 echo Opening Android Studio...
 start "" "%STUDIO%" "%cd%"
 

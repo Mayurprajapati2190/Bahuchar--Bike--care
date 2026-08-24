@@ -3,12 +3,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import PaymentBadge from '@/Components/PaymentBadge.vue';
 import PageActions from '@/Components/PageActions.vue';
-import SmsModeNotice from '@/Components/SmsModeNotice.vue';
+import CustomerMessagingNotice from '@/Components/CustomerMessagingNotice.vue';
+import { buildWhatsAppUrl } from '@/utils/whatsapp';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
     service: Object,
+    customerMessages: Object,
 });
 
 const showCompleteModal = ref(false);
@@ -31,10 +33,12 @@ const completeService = () => {
 };
 
 const sendReminder = () => {
-    if (confirm('Send reminder SMS to this customer now?')) {
+    if (confirm('Send reminder to this customer now? (SMS log, email, WhatsApp ready)')) {
         router.post(`/services/${props.service.id}/send-reminder`);
     }
 };
+
+const whatsAppUrlForSms = (sms) => buildWhatsAppUrl(sms.phone, sms.body);
 
 const formatDate = (value) =>
     value ? new Date(value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -67,6 +71,7 @@ const formatCurrency = (value) =>
                         <StatusBadge :status="service.status" />
                     </div>
                     <p class="mt-1 text-slate-400">{{ service.customer?.name }} · {{ service.customer?.phone }}</p>
+                    <p v-if="service.customer?.email" class="text-sm text-slate-500">{{ service.customer.email }}</p>
                     <p v-if="service.bill" class="mt-2 flex items-center gap-2 text-sm">
                         <span class="text-slate-400">Bill:</span>
                         <Link :href="`/bills/${service.bill.id}`" class="font-medium text-amber-300 underline hover:text-amber-200">
@@ -108,7 +113,7 @@ const formatCurrency = (value) =>
                         class="inline-flex h-9 items-center rounded-xl border border-amber-400/40 px-4 text-sm text-amber-300 hover:bg-amber-400/10"
                         @click="sendReminder"
                     >
-                        Send SMS
+                        Send Reminder
                     </button>
                 </div>
             </div>
@@ -175,19 +180,61 @@ const formatCurrency = (value) =>
                         </dl>
                     </section>
 
-                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-                        <h2 class="mb-4 text-lg font-semibold text-white">SMS Status</h2>
-                        <SmsModeNotice class="mb-4" />
+                    <section v-if="service.status === 'completed'" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
+                        <h2 class="mb-4 text-lg font-semibold text-white">Customer Messages</h2>
+                        <CustomerMessagingNotice class="mb-4" />
+
                         <dl class="space-y-3 text-sm">
                             <div class="flex justify-between gap-4">
-                                <dt class="text-slate-400">Confirmation</dt>
+                                <dt class="text-slate-400">SMS confirmation</dt>
                                 <dd class="text-white">{{ formatDateTime(service.confirmation_sms_sent_at) }}</dd>
                             </div>
                             <div class="flex justify-between gap-4">
-                                <dt class="text-slate-400">Reminder</dt>
+                                <dt class="text-slate-400">Email confirmation</dt>
+                                <dd class="text-white">{{ formatDateTime(service.confirmation_email_sent_at) }}</dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-slate-400">SMS reminder</dt>
                                 <dd class="text-white">{{ formatDateTime(service.reminder_sms_sent_at) }}</dd>
                             </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-slate-400">Email reminder</dt>
+                                <dd class="text-white">{{ formatDateTime(service.reminder_email_sent_at) }}</dd>
+                            </div>
                         </dl>
+
+                        <div v-if="customerMessages" class="mt-5 space-y-3 border-t border-slate-800 pt-4">
+                            <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Confirmation</p>
+                                <p class="mt-2 text-sm text-slate-400">{{ customerMessages.confirmation.body }}</p>
+                                <a
+                                    v-if="customerMessages.confirmation.whatsapp_url"
+                                    :href="customerMessages.confirmation.whatsapp_url"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="mt-3 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                                >
+                                    Send via WhatsApp
+                                </a>
+                            </div>
+                            <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Reminder</p>
+                                <p class="mt-2 text-sm text-slate-400">{{ customerMessages.reminder.body }}</p>
+                                <a
+                                    v-if="customerMessages.reminder.whatsapp_url"
+                                    :href="customerMessages.reminder.whatsapp_url"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="mt-3 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                                >
+                                    Send via WhatsApp
+                                </a>
+                            </div>
+                            <p v-if="!customerMessages.customer_has_email" class="text-xs text-slate-500">
+                                Add customer email to enable automatic email notifications.
+                            </p>
+                        </div>
+
                         <div v-if="service.sms_messages?.length" class="mt-5 border-t border-slate-800 pt-4">
                             <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Message log</p>
                             <ul class="space-y-3">
@@ -213,6 +260,14 @@ const formatCurrency = (value) =>
                                     </div>
                                     <p class="mt-1 text-slate-400">{{ sms.body }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ formatDateTime(sms.sent_at) }} · {{ sms.phone }}</p>
+                                    <a
+                                        :href="whatsAppUrlForSms(sms)"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="mt-2 inline-flex text-xs font-semibold text-emerald-400 hover:text-emerald-300"
+                                    >
+                                        Open in WhatsApp →
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -229,7 +284,7 @@ const formatCurrency = (value) =>
             <div class="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6">
                 <h3 class="text-lg font-semibold text-white">Complete Service & Create Bill</h3>
                 <p class="mt-2 text-sm text-slate-400">
-                    A tax invoice will be generated and a confirmation SMS will be recorded for the customer.
+                    A tax invoice will be generated. Customer messages will be prepared (SMS log, email if available, WhatsApp ready).
                 </p>
 
                 <form class="mt-5 space-y-4" @submit.prevent="completeService">
@@ -257,22 +312,22 @@ const formatCurrency = (value) =>
                         </select>
                     </div>
 
-                <div class="mt-6 flex justify-end gap-3">
-                    <button
-                        type="button"
-                        class="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300"
-                        @click="showCompleteModal = false"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        class="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 disabled:opacity-50"
-                        :disabled="completeForm.processing"
-                    >
-                        Complete & Create Bill
-                    </button>
-                </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            class="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300"
+                            @click="showCompleteModal = false"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 disabled:opacity-50"
+                            :disabled="completeForm.processing"
+                        >
+                            Complete & Create Bill
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

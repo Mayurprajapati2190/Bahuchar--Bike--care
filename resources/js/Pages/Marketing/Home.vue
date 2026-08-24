@@ -1,6 +1,6 @@
 <script setup>
 import MarketingLayout from '@/Layouts/MarketingLayout.vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 defineProps({
@@ -43,6 +43,9 @@ const mapHref = computed(() => `https://www.google.com/maps/search/?api=1&query=
                         <a href="#services" class="rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-bold text-white transition hover:border-amber-400/40 hover:bg-amber-400/5">
                             Explore services ↓
                         </a>
+                        <Link href="/login" class="rounded-full border border-white/10 px-7 py-3.5 text-sm font-bold text-slate-300 transition hover:border-amber-400/40 hover:text-white">
+                            Staff login
+                        </Link>
                     </div>
                     <dl class="mt-12 grid max-w-xl grid-cols-3 border-y border-white/10 py-6">
                         <div><dt class="text-lg font-black text-white">All brands</dt><dd class="mt-1 text-xs text-slate-500">Expert attention</dd></div>
@@ -99,9 +102,9 @@ const mapHref = computed(() => `https://www.google.com/maps/search/?api=1&query=
                         <p class="mt-5 leading-7 text-slate-400">From everyday maintenance to detailed repairs, every job receives focused attention.</p>
                     </div>
                     <div class="grid gap-4 sm:grid-cols-2">
-                        <article v-for="(service, index) in services" :key="service.title" class="service-card group relative overflow-hidden rounded-2xl border border-white/8 bg-[#0b1019] p-6 transition duration-300 hover:-translate-y-1 hover:border-amber-400/30">
+                        <article v-for="(service, index) in services" :key="service.title" class="service-card group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1019] p-6 transition duration-300 hover:-translate-y-1 hover:border-amber-400/30">
                             <span class="absolute right-5 top-3 text-5xl font-black text-white/[0.03]">0{{ index + 1 }}</span>
-                            <span class="grid h-11 w-11 place-items-center rounded-xl border border-amber-400/15 bg-amber-400/8 text-xl transition group-hover:rotate-6 group-hover:scale-110">{{ service.icon }}</span>
+                            <span class="grid h-11 w-11 place-items-center rounded-xl border border-amber-400/15 bg-amber-400/10 text-xl transition group-hover:rotate-6 group-hover:scale-110">{{ service.icon }}</span>
                             <h3 class="mt-5 text-lg font-bold text-white">{{ service.title }}</h3>
                             <p class="mt-2 text-sm leading-6 text-slate-400">{{ service.description }}</p>
                         </article>

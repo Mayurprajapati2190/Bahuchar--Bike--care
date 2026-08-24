@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StatCard from '@/Components/StatCard.vue';
 import PaymentBadge from '@/Components/PaymentBadge.vue';
 import IconLink from '@/Components/IconLink.vue';
-import SmsModeNotice from '@/Components/SmsModeNotice.vue';
+import CustomerMessagingNotice from '@/Components/CustomerMessagingNotice.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
@@ -44,7 +44,7 @@ const formatCurrency = (value) =>
                 </div>
             </section>
 
-            <SmsModeNotice />
+            <CustomerMessagingNotice />
 
             <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <StatCard title="Total Customers" accent="blue">{{ stats.totalCustomers }}</StatCard>

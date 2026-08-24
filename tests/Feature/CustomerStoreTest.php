@@ -95,4 +95,14 @@ class CustomerStoreTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page->component('Marketing/Home'));
     }
+
+    public function test_marketing_home_stays_public_when_logged_in(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->actingAs($user)
+            ->get('/')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Marketing/Home'));
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendServiceReminderEmail;
 use App\Jobs\SendServiceReminderSms;
 use App\Models\ServiceRecord;
 use Illuminate\Console\Command;
@@ -25,6 +26,7 @@ class SendServiceReminders extends Command
 
         foreach ($dueServices as $serviceId) {
             SendServiceReminderSms::dispatch($serviceId);
+            SendServiceReminderEmail::dispatch($serviceId);
         }
 
         $this->info("Queued {$dueServices->count()} reminder SMS job(s).");

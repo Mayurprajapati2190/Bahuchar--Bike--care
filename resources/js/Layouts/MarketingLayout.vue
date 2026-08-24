@@ -4,7 +4,11 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const shop = computed(() => usePage().props.shop ?? {});
-const phoneHref = computed(() => `tel:+91${(shop.value.phone ?? '').replace(/\D/g, '').replace(/^91/, '')}`);
+const user = computed(() => usePage().props.auth?.user ?? null);
+const phoneHref = computed(() => {
+    const phone = (shop.value.phone ?? '').replace(/\D/g, '').replace(/^91/, '');
+    return phone ? `tel:+91${phone}` : null;
+});
 const hours = computed(() => (shop.value.hours ?? '').split('|').map((item) => item.trim()).filter(Boolean));
 </script>
 
@@ -26,14 +30,31 @@ const hours = computed(() => (shop.value.hours ?? '').split('|').map((item) => i
                     <a href="#why-us" class="text-slate-300 transition hover:text-amber-400">Why us</a>
                     <a href="#contact" class="text-slate-300 transition hover:text-amber-400">Contact</a>
                 </nav>
-                <a
-                    :href="phoneHref"
-                    class="group inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/10 transition hover:-translate-y-0.5 hover:bg-amber-300"
-                >
-                    <span class="grid h-5 w-5 place-items-center rounded-full bg-slate-950 text-[10px] text-amber-300">●</span>
-                    <span class="hidden sm:inline">Call {{ shop.phone }}</span>
-                    <span class="sm:hidden">Call now</span>
-                </a>
+                <div class="flex items-center gap-3">
+                    <Link
+                        v-if="user"
+                        href="/dashboard"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white transition hover:border-amber-400/40 hover:bg-amber-400/10"
+                    >
+                        Dashboard
+                    </Link>
+                    <Link
+                        v-else
+                        href="/login"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white transition hover:border-amber-400/40 hover:bg-amber-400/10"
+                    >
+                        Staff login
+                    </Link>
+                    <a
+                        v-if="phoneHref"
+                        :href="phoneHref"
+                        class="group inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/10 transition hover:-translate-y-0.5 hover:bg-amber-300"
+                    >
+                        <span class="grid h-5 w-5 place-items-center rounded-full bg-slate-950 text-[10px] text-amber-300">●</span>
+                        <span class="hidden sm:inline">Call {{ shop.phone }}</span>
+                        <span class="sm:hidden">Call now</span>
+                    </a>
+                </div>
             </div>
         </header>
 
@@ -56,7 +77,7 @@ const hours = computed(() => (shop.value.hours ?? '').split('|').map((item) => i
                 </div>
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-amber-400">Contact & location</p>
-                    <a :href="phoneHref" class="mt-4 block text-xl font-bold text-white transition hover:text-amber-300">+91 {{ shop.phone }}</a>
+                    <a v-if="phoneHref" :href="phoneHref" class="mt-4 block text-xl font-bold text-white transition hover:text-amber-300">+91 {{ shop.phone }}</a>
                     <p v-if="shop.address" class="mt-3 max-w-sm text-sm leading-6 text-slate-400">{{ shop.address }}</p>
                 </div>
                 <div>
