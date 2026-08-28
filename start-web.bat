@@ -49,9 +49,13 @@ echo  App URL:  http://bahuchar-bike-care.test
 echo  Login:    http://bahuchar-bike-care.test/login
 echo  Dashboard: http://bahuchar-bike-care.test/dashboard
 echo.
-echo  Staff login:
+echo  Super admin:
 echo    Email:    mayurprajapati2190@gmail.com
 echo    Password: Mayur@2190
+echo.
+echo  Simple staff login:
+echo    Email:    staff@bahuchar.test
+echo    Password: Staff@123
 echo.
 echo  Make sure Laravel Herd is running.
 echo.

@@ -116,6 +116,8 @@ class BillController extends Controller
 
     public function destroy(Bill $bill): RedirectResponse
     {
+        $this->authorizeSuperAdmin();
+
         $service = $bill->serviceRecord;
         $billNumber = $bill->bill_number;
 

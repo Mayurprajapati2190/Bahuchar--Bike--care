@@ -19,7 +19,10 @@ const submit = () => {
 <template>
     <Head title="Register" />
 
-    <GuestLayout title="Create your account">
+    <GuestLayout title="Create a staff account">
+        <p class="mb-5 text-sm text-slate-400">
+            Register for a shop staff login. Super admin access stays with the owner account.
+        </p>
         <form class="space-y-5" @submit.prevent="submit">
             <div>
                 <label for="name" class="mb-1 block text-sm text-slate-300">Name</label>
@@ -79,9 +82,12 @@ const submit = () => {
                 Register
             </button>
 
-            <p class="text-center text-sm text-slate-400">
-                Already registered?
-                <Link href="/login" class="text-amber-400 hover:text-amber-300">Log in</Link>
+            <p class="flex items-center justify-between text-sm">
+                <Link href="/" class="text-slate-400 hover:text-white">← Back to website</Link>
+                <span class="text-slate-400">
+                    Already registered?
+                    <Link href="/login" class="text-amber-400 hover:text-amber-300">Log in</Link>
+                </span>
             </p>
         </form>
     </GuestLayout>

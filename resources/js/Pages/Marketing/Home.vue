@@ -8,53 +8,72 @@ defineProps({
 });
 
 const shop = computed(() => usePage().props.shop ?? {});
+const user = computed(() => usePage().props.auth?.user ?? null);
 
 const phoneHref = computed(() => {
     const phone = shop.value.phone?.replace(/\D/g, '') ?? '';
     return phone ? `tel:+91${phone.replace(/^91/, '')}` : null;
 });
-
-const mapHref = computed(() => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.value.address ?? '')}`);
 </script>
 
 <template>
     <Head :title="shop.name ?? 'Home'" />
 
     <MarketingLayout>
-        <section class="relative mx-auto min-h-[calc(100vh-72px)] max-w-7xl px-4 py-16 md:px-8 md:py-24">
+        <section class="relative mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
             <div class="hero-grid absolute inset-0 opacity-30" />
-            <div class="relative grid items-center gap-16 lg:grid-cols-[1.05fr_.95fr]">
+            <div class="relative grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                 <div>
                     <div class="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-300">
                         <span class="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
                         Professional two-wheeler care
                     </div>
-                    <h1 class="mt-7 max-w-3xl text-5xl font-black leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
+                    <h1 class="mt-6 max-w-3xl text-4xl font-black leading-[0.95] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
                         Give your ride the
                         <span class="block bg-gradient-to-r from-amber-300 via-amber-500 to-orange-500 bg-clip-text text-transparent">care it deserves.</span>
                     </h1>
-                    <p class="mt-7 max-w-xl text-base leading-7 text-slate-400 sm:text-lg">
+                    <p class="mt-6 max-w-xl text-base leading-7 text-slate-400 sm:text-lg">
                         Reliable service, precise repairs and genuine care for motorcycles, scooters and electric two-wheelers in Gota, Ahmedabad.
                     </p>
-                    <div class="mt-9 flex flex-wrap gap-3">
-                        <a v-if="phoneHref" :href="phoneHref" class="rounded-full bg-amber-400 px-7 py-3.5 text-sm font-extrabold text-slate-950 shadow-xl shadow-amber-500/15 transition hover:-translate-y-1 hover:bg-amber-300">
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <a v-if="phoneHref" :href="phoneHref" class="rounded-full bg-amber-400 px-6 py-3 text-sm font-extrabold text-slate-950 shadow-xl shadow-amber-500/15 transition hover:-translate-y-1 hover:bg-amber-300">
                             Book a service
                         </a>
-                        <a href="#services" class="rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-bold text-white transition hover:border-amber-400/40 hover:bg-amber-400/5">
-                            Explore services ↓
-                        </a>
-                        <Link href="/login" class="rounded-full border border-white/10 px-7 py-3.5 text-sm font-bold text-slate-300 transition hover:border-amber-400/40 hover:text-white">
-                            Staff login
+                        <Link href="/our-services" class="rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition hover:border-amber-400/40 hover:bg-amber-400/5">
+                            Explore services
+                        </Link>
+                        <Link
+                            v-if="user"
+                            href="/dashboard"
+                            class="rounded-full border border-amber-400/40 bg-amber-400/10 px-6 py-3 text-sm font-bold text-amber-300 transition hover:bg-amber-400/20 hover:text-amber-200"
+                        >
+                            Open dashboard
+                        </Link>
+                        <Link
+                            v-else
+                            href="/register"
+                            class="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-slate-300 transition hover:border-amber-400/40 hover:text-white"
+                        >
+                            Register
                         </Link>
                     </div>
-                    <dl class="mt-12 grid max-w-xl grid-cols-3 border-y border-white/10 py-6">
-                        <div><dt class="text-lg font-black text-white">All brands</dt><dd class="mt-1 text-xs text-slate-500">Expert attention</dd></div>
-                        <div class="border-x border-white/10 px-5"><dt class="text-lg font-black text-white">Quality</dt><dd class="mt-1 text-xs text-slate-500">Parts & products</dd></div>
-                        <div class="pl-5"><dt class="text-lg font-black text-white">Honest</dt><dd class="mt-1 text-xs text-slate-500">Clear estimates</dd></div>
+                    <dl class="mt-10 grid max-w-xl grid-cols-3 gap-4 border-y border-white/10 py-6">
+                        <div class="text-center sm:text-left">
+                            <dt class="text-base font-black text-white sm:text-lg">All brands</dt>
+                            <dd class="mt-1 text-xs text-slate-500">Expert attention</dd>
+                        </div>
+                        <div class="border-x border-white/10 px-3 text-center sm:px-5 sm:text-left">
+                            <dt class="text-base font-black text-white sm:text-lg">Quality</dt>
+                            <dd class="mt-1 text-xs text-slate-500">Parts & products</dd>
+                        </div>
+                        <div class="text-center sm:text-left">
+                            <dt class="text-base font-black text-white sm:text-lg">Honest</dt>
+                            <dd class="mt-1 text-xs text-slate-500">Clear estimates</dd>
+                        </div>
                     </dl>
                 </div>
 
-                <div class="relative mx-auto w-full max-w-xl [perspective:1100px]">
+                <div class="relative mx-auto w-full max-w-md lg:max-w-xl [perspective:1100px]">
                     <div class="bike-glow absolute inset-10 rounded-full bg-amber-500/20 blur-3xl" />
                     <div class="bike-scene relative aspect-square [transform-style:preserve-3d]">
                         <div class="absolute inset-[8%] rounded-[3rem] border border-white/10 bg-gradient-to-br from-white/10 via-slate-900/80 to-black shadow-2xl shadow-black/60 [transform:rotateY(-10deg)_rotateX(5deg)]">
@@ -93,70 +112,59 @@ const mapHref = computed(() => `https://www.google.com/maps/search/?api=1&query=
             </div>
         </section>
 
-        <section id="services" class="relative border-y border-white/5 bg-white/[0.025] py-20">
-            <div class="mx-auto max-w-7xl px-4 md:px-8">
-                <div class="grid gap-8 lg:grid-cols-[.7fr_1.3fr]">
+        <section class="relative border-y border-white/5 bg-white/[0.025] py-16 lg:py-20">
+            <div class="mx-auto max-w-7xl px-4 lg:px-8">
+                <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <p class="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">What we do</p>
-                        <h2 class="mt-4 text-4xl font-black leading-tight tracking-tight text-white">Everything your bike needs, under one roof.</h2>
-                        <p class="mt-5 leading-7 text-slate-400">From everyday maintenance to detailed repairs, every job receives focused attention.</p>
+                        <h2 class="mt-4 max-w-xl text-3xl font-black tracking-tight text-white sm:text-4xl">Service that keeps every ride ready.</h2>
                     </div>
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <article v-for="(service, index) in services" :key="service.title" class="service-card group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1019] p-6 transition duration-300 hover:-translate-y-1 hover:border-amber-400/30">
-                            <span class="absolute right-5 top-3 text-5xl font-black text-white/[0.03]">0{{ index + 1 }}</span>
-                            <span class="grid h-11 w-11 place-items-center rounded-xl border border-amber-400/15 bg-amber-400/10 text-xl transition group-hover:rotate-6 group-hover:scale-110">{{ service.icon }}</span>
-                            <h3 class="mt-5 text-lg font-bold text-white">{{ service.title }}</h3>
-                            <p class="mt-2 text-sm leading-6 text-slate-400">{{ service.description }}</p>
-                        </article>
-                    </div>
+                    <Link href="/our-services" class="inline-flex items-center gap-2 text-sm font-bold text-amber-400 transition hover:text-amber-300">
+                        View all services <span>→</span>
+                    </Link>
+                </div>
+                <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <article v-for="(service, index) in services" :key="service.title" class="service-card group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1019] p-6 transition duration-300 hover:-translate-y-1 hover:border-amber-400/30">
+                        <span class="absolute right-5 top-3 text-5xl font-black text-white/[0.03]">0{{ index + 1 }}</span>
+                        <span class="grid h-11 w-11 place-items-center rounded-xl border border-amber-400/15 bg-amber-400/10 text-xl">{{ service.icon }}</span>
+                        <h3 class="mt-5 text-lg font-bold text-white">{{ service.title }}</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-400">{{ service.description }}</p>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <section id="why-us" class="py-24">
-            <div class="mx-auto max-w-7xl px-4 md:px-8">
-                <div class="grid items-center gap-14 lg:grid-cols-2">
-                    <div class="relative">
-                        <div class="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-amber-400/15 to-transparent blur-xl" />
-                        <div class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-800 to-[#080b11] p-8 sm:p-10">
-                            <div class="absolute -right-16 -top-16 h-56 w-56 rounded-full border-[38px] border-amber-400/5" />
-                            <p class="text-xs font-bold uppercase tracking-[.25em] text-amber-400">The Bahuchar promise</p>
-                            <p class="mt-6 max-w-md text-3xl font-black leading-tight text-white">No shortcuts. No surprises. Just dependable bike care.</p>
-                            <div class="mt-10 grid grid-cols-2 gap-4">
-                                <div class="rounded-2xl bg-white/5 p-4"><p class="text-2xl font-black text-amber-400">01</p><p class="mt-2 text-sm text-slate-300">Inspect carefully</p></div>
-                                <div class="rounded-2xl bg-white/5 p-4"><p class="text-2xl font-black text-amber-400">02</p><p class="mt-2 text-sm text-slate-300">Explain clearly</p></div>
-                                <div class="rounded-2xl bg-white/5 p-4"><p class="text-2xl font-black text-amber-400">03</p><p class="mt-2 text-sm text-slate-300">Repair precisely</p></div>
-                                <div class="rounded-2xl bg-white/5 p-4"><p class="text-2xl font-black text-amber-400">04</p><p class="mt-2 text-sm text-slate-300">Deliver confidently</p></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">Why riders choose us</p>
-                        <h2 class="mt-4 text-4xl font-black tracking-tight text-white">Service built around trust.</h2>
-                        <div class="mt-8 space-y-6">
-                            <div v-for="item in [
-                                ['Skilled hands', 'Careful workmanship for all major two-wheeler brands.'],
-                                ['Transparent estimates', 'Understand the work and cost before repairs begin.'],
-                                ['Service history', 'Organised digital records make future maintenance easier.'],
-                                ['Quality-focused care', 'The right products, parts and process for your ride.'],
-                            ]" :key="item[0]" class="flex gap-4">
-                                <span class="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber-400 text-xs font-black text-slate-950">✓</span>
-                                <div><h3 class="font-bold text-white">{{ item[0] }}</h3><p class="mt-1 text-sm leading-6 text-slate-400">{{ item[1] }}</p></div>
-                            </div>
-                        </div>
-                    </div>
+        <section class="py-16 lg:py-20">
+            <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2 lg:gap-14 lg:px-8">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">Why riders choose us</p>
+                    <h2 class="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl">No shortcuts. No surprises.</h2>
+                    <p class="mt-5 max-w-xl leading-7 text-slate-400">Honest estimates, skilled workmanship, and organised service history for every bike we look after.</p>
+                    <Link href="/why-us" class="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition hover:border-amber-400/40 hover:bg-amber-400/5">
+                        Why Bahuchar <span>→</span>
+                    </Link>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl border border-white/10 bg-[#0b1019] p-5"><p class="text-2xl font-black text-amber-400">01</p><p class="mt-2 text-sm text-slate-300">Inspect carefully</p></div>
+                    <div class="rounded-2xl border border-white/10 bg-[#0b1019] p-5"><p class="text-2xl font-black text-amber-400">02</p><p class="mt-2 text-sm text-slate-300">Explain clearly</p></div>
+                    <div class="rounded-2xl border border-white/10 bg-[#0b1019] p-5"><p class="text-2xl font-black text-amber-400">03</p><p class="mt-2 text-sm text-slate-300">Repair precisely</p></div>
+                    <div class="rounded-2xl border border-white/10 bg-[#0b1019] p-5"><p class="text-2xl font-black text-amber-400">04</p><p class="mt-2 text-sm text-slate-300">Deliver confidently</p></div>
                 </div>
             </div>
         </section>
 
-        <section class="px-4 pb-24 md:px-8">
-            <div class="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-amber-400 px-6 py-12 text-slate-950 sm:px-12">
+        <section class="px-4 pb-16 lg:px-8 lg:pb-20">
+            <div class="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-amber-400 px-6 py-10 text-slate-950 sm:px-12 sm:py-12">
                 <div class="absolute -right-12 -top-32 h-80 w-80 rounded-full border-[55px] border-slate-950/5" />
                 <div class="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
-                    <div><p class="text-xs font-black uppercase tracking-[.25em]">Visit Bahuchar Auto Care</p><h2 class="mt-3 max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">Ready for a smoother, safer ride?</h2><p class="mt-3 max-w-xl text-sm font-medium text-slate-800">Walk in during business hours or call us to plan your service.</p></div>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[.25em]">Visit Bahuchar Auto Care</p>
+                        <h2 class="mt-3 max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">Ready for a smoother, safer ride?</h2>
+                        <p class="mt-3 max-w-xl text-sm font-medium text-slate-800">Walk in during business hours or call us to plan your service.</p>
+                    </div>
                     <div class="flex flex-wrap gap-3">
-                        <a :href="phoneHref" class="rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-1">Call {{ shop.phone }}</a>
-                        <a :href="mapHref" target="_blank" rel="noopener" class="rounded-full border border-slate-950/20 px-6 py-3 text-sm font-bold transition hover:bg-slate-950/10">Get directions ↗</a>
+                        <Link href="/contact" class="rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-1">Contact us</Link>
+                        <a v-if="phoneHref" :href="phoneHref" class="rounded-full border border-slate-950/20 px-6 py-3 text-sm font-bold transition hover:bg-slate-950/10">Call {{ shop.phone }}</a>
                     </div>
                 </div>
             </div>

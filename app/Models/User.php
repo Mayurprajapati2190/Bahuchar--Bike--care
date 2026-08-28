@@ -37,13 +37,18 @@ class User extends Authenticatable
         return $this->hasMany(ServiceRecord::class, 'created_by');
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return (bool) $this->is_platform_admin;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === self::ROLE_ADMIN || $this->is_platform_admin;
+        return $this->role === self::ROLE_ADMIN || $this->isSuperAdmin();
     }
 
     public function isPlatformAdmin(): bool
     {
-        return $this->isAdmin();
+        return $this->isSuperAdmin();
     }
 }

@@ -1,6 +1,6 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import AppIcon from '@/Components/AppIcon.vue';
 
 const props = defineProps({
@@ -11,6 +11,8 @@ const props = defineProps({
     variant: { type: String, default: 'icon' },
     size: { type: String, default: 'sm' },
 });
+
+const canDelete = computed(() => Boolean(usePage().props.auth?.user?.is_super_admin));
 
 const open = ref(false);
 
@@ -35,7 +37,7 @@ const sizeClasses = {
 </script>
 
 <template>
-    <div>
+    <div v-if="canDelete">
         <button
             type="button"
             :title="label"

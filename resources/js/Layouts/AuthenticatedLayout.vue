@@ -6,18 +6,30 @@ import FlashMessage from '@/Components/FlashMessage.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+const isSuperAdmin = computed(() => Boolean(user.value?.is_super_admin));
 const pending = computed(() => page.props.pendingPayments ?? { count: 0, amount: 0 });
 const messagingFreeMode = computed(
     () => page.props.notifications?.smsMode === 'free' || !page.props.notifications?.emailLive,
 );
 
-const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: '⌂' },
-    { name: 'Customers', href: '/customers', icon: '👤' },
-    { name: 'Services', href: '/services', icon: '🔧' },
-    { name: 'Bills', href: '/bills', icon: '🧾' },
-    { name: 'Pending Payments', href: '/bills/pending/list', icon: '⏳', badge: true },
-];
+const navItems = computed(() => {
+    const items = [
+        { name: 'Dashboard', href: '/dashboard', icon: '⌂' },
+        { name: 'Customers', href: '/customers', icon: '👤' },
+        { name: 'Services', href: '/services', icon: '🔧' },
+        { name: 'Bills', href: '/bills', icon: '🧾' },
+        { name: 'Pending Payments', href: '/bills/pending/list', icon: '⏳', badge: true },
+    ];
+
+    if (isSuperAdmin.value) {
+        items.push(
+            { name: 'Staff', href: '/staff', icon: '🛡' },
+            { name: 'Backups', href: '/backups', icon: '💾' },
+        );
+    }
+
+    return items;
+});
 
 const isActive = (href) => {
     if (href === '/bills/pending/list') {
@@ -82,6 +94,7 @@ const formatCurrency = (value) =>
 
                 <div class="absolute bottom-0 w-72 border-t border-slate-800 px-4 py-4">
                     <p class="truncate text-sm font-medium text-white">{{ user?.name }}</p>
+                    <p class="truncate text-xs text-amber-400">{{ isSuperAdmin ? 'Super admin' : 'Staff' }}</p>
                     <p class="truncate text-xs text-slate-400">{{ user?.email }}</p>
                     <button
                         type="button"

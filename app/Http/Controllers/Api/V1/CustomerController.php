@@ -104,6 +104,8 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer): JsonResponse
     {
+        $this->authorizeSuperAdmin();
+
         $customer->delete();
 
         return response()->json(['message' => 'Customer deleted successfully.']);

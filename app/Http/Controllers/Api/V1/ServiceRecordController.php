@@ -147,6 +147,8 @@ class ServiceRecordController extends Controller
 
     public function destroy(ServiceRecord $service): JsonResponse
     {
+        $this->authorizeSuperAdmin();
+
         $service->delete();
 
         return response()->json(['message' => 'Service record deleted successfully.']);

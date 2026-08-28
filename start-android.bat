@@ -44,6 +44,7 @@ echo  Run config:   staff  (shop login app)
 echo                customer (OTP app for customers)
 echo.
 echo  Backend must be running: http://bahuchar-bike-care.test
-echo  Staff login: mayurprajapati2190@gmail.com / Mayur@2190
+echo  Super admin: mayurprajapati2190@gmail.com / Mayur@2190
+echo  Staff login: staff@bahuchar.test / Staff@123
 echo.
 pause

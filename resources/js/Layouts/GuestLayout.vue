@@ -12,8 +12,8 @@ defineProps({
 
 <template>
     <div class="min-h-screen bg-slate-950 text-slate-100">
-        <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-            <div class="mb-8 flex flex-col items-center text-center">
+        <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10 sm:px-6 sm:py-12">
+            <div class="mb-6 flex flex-col items-center text-center">
                 <Link href="/">
                     <AppLogo icon-class="h-14 w-14" />
                 </Link>

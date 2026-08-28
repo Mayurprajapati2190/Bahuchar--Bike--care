@@ -250,6 +250,8 @@ class CustomerController extends Controller
 
     {
 
+        $this->authorizeSuperAdmin();
+
         $customer->delete();
 
 

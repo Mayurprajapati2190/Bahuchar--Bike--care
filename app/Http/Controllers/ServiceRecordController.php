@@ -192,6 +192,8 @@ class ServiceRecordController extends Controller
 
     public function destroy(ServiceRecord $service): RedirectResponse
     {
+        $this->authorizeSuperAdmin();
+
         $service->delete();
 
         return redirect()

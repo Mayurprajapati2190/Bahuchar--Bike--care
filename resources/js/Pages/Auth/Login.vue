@@ -16,9 +16,12 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Staff login" />
 
-    <GuestLayout title="Sign in to your account">
+    <GuestLayout title="Staff login">
+        <p class="mb-5 text-sm text-slate-400">
+            Super admin and shop staff use the same login page. After sign-in you go to the dashboard.
+        </p>
         <form class="space-y-5" @submit.prevent="submit">
             <div>
                 <label for="email" class="mb-1 block text-sm text-slate-300">Email</label>
@@ -61,17 +64,22 @@ const submit = () => {
                 class="w-full rounded-lg bg-amber-400 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-amber-300 disabled:opacity-60"
                 :disabled="form.processing"
             >
-                Log in
+                Log in to dashboard
             </button>
 
             <div class="flex items-center justify-between text-sm">
                 <Link href="/" class="text-slate-400 hover:text-white">
                     ← Back to website
                 </Link>
-                <Link href="/forgot-password" class="text-amber-400 hover:text-amber-300">
-                    Forgot password?
+                <Link href="/register" class="text-amber-400 hover:text-amber-300">
+                    Register
                 </Link>
             </div>
+            <p class="text-center text-sm">
+                <Link href="/forgot-password" class="text-slate-500 hover:text-amber-300">
+                    Forgot password?
+                </Link>
+            </p>
         </form>
     </GuestLayout>
 </template>

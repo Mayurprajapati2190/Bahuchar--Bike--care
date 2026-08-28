@@ -21,6 +21,7 @@ class BikeController extends Controller
     public function destroy(Customer $customer, Bike $bike): RedirectResponse
     {
         abort_unless($bike->customer_id === $customer->id, 404);
+        $this->authorizeSuperAdmin();
 
         $bike->delete();
 
