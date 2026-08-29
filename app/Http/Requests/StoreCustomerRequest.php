@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\RegistrationNumber;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCustomerRequest extends FormRequest
@@ -9,6 +10,17 @@ class StoreCustomerRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('bike.registration_number')) {
+            return;
+        }
+
+        $bike = $this->input('bike', []);
+        $bike['registration_number'] = RegistrationNumber::normalize($bike['registration_number'] ?? null);
+        $this->merge(['bike' => $bike]);
     }
 
     /**

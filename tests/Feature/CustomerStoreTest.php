@@ -69,6 +69,27 @@ class CustomerStoreTest extends TestCase
         $response->assertRedirect(route('customers.show', $customer));
     }
 
+    public function test_bike_registration_number_is_saved_in_uppercase(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->actingAs($user)->post(route('customers.store'), [
+            'name' => 'Lowercase Reg Test',
+            'phone' => '9988776655',
+            'bike' => [
+                'brand' => 'Honda',
+                'model' => 'Activa',
+                'registration_number' => 'gj01ab1234',
+            ],
+            'add_service' => false,
+        ]);
+
+        $customer = Customer::query()->where('phone', '9988776655')->first();
+
+        $this->assertNotNull($customer);
+        $this->assertSame('GJ01AB1234', $customer->bikes->first()->registration_number);
+    }
+
     public function test_customer_create_requires_bike_registration_number(): void
     {
         $user = User::factory()->create(['role' => User::ROLE_ADMIN]);

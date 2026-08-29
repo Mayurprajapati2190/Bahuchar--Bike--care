@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ConfirmDelete from '@/Components/ConfirmDelete.vue';
 import IconLink from '@/Components/IconLink.vue';
 import PageActions from '@/Components/PageActions.vue';
+import RegistrationNumberInput from '@/Components/RegistrationNumberInput.vue';
 import ServiceItemsEditor from '@/Components/ServiceItemsEditor.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import AppIcon from '@/Components/AppIcon.vue';
@@ -141,13 +142,12 @@ const formatCurrency = (value) =>
                         placeholder="Model"
                         class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-white focus:border-amber-400 focus:outline-none"
                     />
-                    <input
+                    <RegistrationNumberInput
                         v-model="bikeForm.registration_number"
-                        type="text"
                         required
                         maxlength="50"
                         placeholder="Registration no. *"
-                        class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-white focus:border-amber-400 focus:outline-none"
+                        class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 uppercase text-white focus:border-amber-400 focus:outline-none"
                     />
                     <button
                         type="submit"

@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ServiceItemsEditor from '@/Components/ServiceItemsEditor.vue';
+import RegistrationNumberInput from '@/Components/RegistrationNumberInput.vue';
 import AppIcon from '@/Components/AppIcon.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -139,13 +140,12 @@ const submit = () => {
 
                         <div>
                             <label class="mb-1.5 block text-sm text-slate-300">Registration No. *</label>
-                            <input
+                            <RegistrationNumberInput
                                 v-model="form.bike.registration_number"
-                                type="text"
                                 required
                                 maxlength="50"
                                 placeholder="GJ XX XX XXXX"
-                                class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-amber-400 focus:outline-none"
+                                class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 uppercase text-white focus:border-amber-400 focus:outline-none"
                             />
                             <p v-if="form.errors['bike.registration_number']" class="mt-1 text-sm text-red-400">
                                 {{ form.errors['bike.registration_number'] }}

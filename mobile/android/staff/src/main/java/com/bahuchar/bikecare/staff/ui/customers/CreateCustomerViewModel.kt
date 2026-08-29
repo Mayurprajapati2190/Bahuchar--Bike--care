@@ -53,7 +53,7 @@ class CreateCustomerViewModel @Inject constructor(
     fun updateAddress(value: String) = updateField { copy(address = value) }
     fun updateBikeBrand(value: String) = updateField { copy(bikeBrand = value) }
     fun updateBikeModel(value: String) = updateField { copy(bikeModel = value) }
-    fun updateBikeRegistration(value: String) = updateField { copy(bikeRegistration = value) }
+    fun updateBikeRegistration(value: String) = updateField { copy(bikeRegistration = value.uppercase()) }
     fun updateAddService(value: Boolean) = updateField { copy(addService = value) }
     fun updateServiceDate(value: String) = updateField { copy(serviceDate = value) }
     fun updateWorkDone(value: String) = updateField { copy(workDone = value) }
