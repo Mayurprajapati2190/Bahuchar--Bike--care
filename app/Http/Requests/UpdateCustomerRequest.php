@@ -23,7 +23,9 @@ class UpdateCustomerRequest extends FormRequest
                 'required',
                 'string',
                 'regex:/^[6-9]\d{9}$/',
-                Rule::unique('customers', 'phone')->ignore($this->route('customer')),
+                Rule::unique('customers', 'phone')
+                    ->ignore($this->route('customer'))
+                    ->where(fn ($query) => $query->where('team_id', $this->user()?->current_team_id)),
             ],
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:1000'],

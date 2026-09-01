@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Support\RegistrationNumber;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreCustomerRequest extends FormRequest
 {
@@ -30,7 +31,14 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/', 'unique:customers,phone'],
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^[6-9]\d{9}$/',
+                Rule::unique('customers', 'phone')->where(
+                    fn ($query) => $query->where('team_id', $this->user()?->current_team_id)
+                ),
+            ],
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:1000'],
             'bike.brand' => ['required', 'string', 'max:255'],

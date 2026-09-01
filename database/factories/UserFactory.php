@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -43,5 +44,26 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            if ($user->teams()->exists()) {
+                return;
+            }
+
+            $team = $user->current_team_id
+                ? Team::query()->find($user->current_team_id)
+                : Team::query()->orderBy('id')->first();
+
+            $team ??= Team::factory()->create();
+
+            $user->teams()->syncWithoutDetaching([$team->id]);
+
+            if (! $user->current_team_id) {
+                $user->forceFill(['current_team_id' => $team->id])->saveQuietly();
+            }
+        });
     }
 }

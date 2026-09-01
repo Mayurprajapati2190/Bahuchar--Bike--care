@@ -10,7 +10,7 @@ class StaffUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::query()->updateOrCreate(
+        $staff = User::query()->updateOrCreate(
             ['email' => 'staff@bahuchar.test'],
             [
                 'name' => 'Shop Staff',
@@ -20,5 +20,7 @@ class StaffUserSeeder extends Seeder
                 'is_platform_admin' => false,
             ],
         );
+
+        $staff->ensureTeamMembership();
     }
 }

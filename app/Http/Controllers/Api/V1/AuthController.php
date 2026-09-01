@@ -28,6 +28,8 @@ class AuthController extends Controller
             ]);
         }
 
+        $user->resolveCurrentTeam();
+
         $token = $user->createToken(
             $credentials['device_name'] ?? 'staff-android',
             ['staff']
@@ -35,7 +37,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => new UserResource($user),
+            'user' => $this->userResource($user),
         ]);
     }
 
@@ -48,6 +50,14 @@ class AuthController extends Controller
 
     public function user(Request $request): UserResource
     {
-        return new UserResource($request->user());
+        return $this->userResource($request->user());
+    }
+
+    private function userResource(User $user): UserResource
+    {
+        $user->loadMissing('currentTeam');
+        $user->setRelation('teams', $user->availableTeams());
+
+        return new UserResource($user);
     }
 }

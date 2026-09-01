@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTeam;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
+    'team_id',
     'service_record_id',
     'bill_number',
     'bill_date',
@@ -21,6 +23,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class Bill extends Model
 {
+    use BelongsToTeam;
+
     public const PAYMENT_PAID = 'paid';
 
     public const PAYMENT_UNPAID = 'unpaid';

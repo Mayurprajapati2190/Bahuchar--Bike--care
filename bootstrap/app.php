@@ -1,9 +1,15 @@
 <?php
 
+use App\Http\Middleware\EnsureCurrentTeam;
+use App\Http\Middleware\EnsureCustomerUser;
+use App\Http\Middleware\EnsureStaffUser;
+use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,13 +20,24 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
+            EnsureCurrentTeam::class,
+            HandleInertiaRequests::class,
         ]);
 
+        $middleware->api(append: [
+            EnsureCurrentTeam::class,
+        ]);
+
+        $middleware->prependToPriorityList(
+            SubstituteBindings::class,
+            EnsureCurrentTeam::class,
+        );
+
         $middleware->alias([
-            'super-admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
-            'staff' => \App\Http\Middleware\EnsureStaffUser::class,
-            'customer' => \App\Http\Middleware\EnsureCustomerUser::class,
+            'super-admin' => EnsureSuperAdmin::class,
+            'staff' => EnsureStaffUser::class,
+            'customer' => EnsureCustomerUser::class,
+            'current-team' => EnsureCurrentTeam::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

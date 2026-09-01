@@ -10,7 +10,7 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::query()->updateOrCreate(
+        $admin = User::query()->updateOrCreate(
             ['email' => 'mayurprajapati2190@gmail.com'],
             [
                 'name' => 'Mayur Prajapati',
@@ -20,5 +20,7 @@ class AdminUserSeeder extends Seeder
                 'is_platform_admin' => true,
             ],
         );
+
+        $admin->ensureTeamMembership();
     }
 }

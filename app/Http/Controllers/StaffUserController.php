@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,9 +17,11 @@ class StaffUserController extends Controller
     {
         return Inertia::render('Staff/Index', [
             'users' => User::query()
+                ->with('teams:id,name')
                 ->orderByDesc('is_platform_admin')
                 ->orderBy('name')
-                ->get(['id', 'name', 'email', 'role', 'is_platform_admin', 'created_at']),
+                ->get(['id', 'name', 'email', 'role', 'is_platform_admin', 'current_team_id', 'created_at']),
+            'teams' => Team::query()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -28,16 +31,35 @@ class StaffUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'string', Password::min(8)],
+            'team_ids' => ['nullable', 'array'],
+            'team_ids.*' => ['integer', Rule::exists('teams', 'id')],
         ]);
 
-        User::query()->create([
+        $teamIds = collect($data['team_ids'] ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($teamIds->isEmpty() && $request->user()?->current_team_id) {
+            $teamIds = collect([(int) $request->user()->current_team_id]);
+        }
+
+        $user = User::query()->create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
             'email_verified_at' => now(),
             'role' => User::ROLE_STAFF,
             'is_platform_admin' => false,
+            'current_team_id' => $teamIds->first(),
         ]);
+
+        if ($teamIds->isNotEmpty()) {
+            $user->teams()->sync($teamIds->all());
+        } else {
+            $user->ensureTeamMembership();
+        }
 
         return redirect()
             ->route('staff.index')

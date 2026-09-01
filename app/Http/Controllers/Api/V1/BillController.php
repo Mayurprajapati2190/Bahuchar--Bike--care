@@ -101,7 +101,7 @@ class BillController extends Controller
 
         return view('bills.print', [
             'bill' => $bill,
-            'shop' => config('shop'),
+            'shop' => $this->shopPayload(),
         ]);
     }
 

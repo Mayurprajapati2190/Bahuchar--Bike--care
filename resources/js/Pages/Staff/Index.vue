@@ -3,14 +3,19 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ConfirmDelete from '@/Components/ConfirmDelete.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     users: Array,
+    teams: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const form = useForm({
     name: '',
     email: '',
     password: '',
+    team_ids: [],
 });
 
 const submit = () => {
@@ -27,7 +32,7 @@ const submit = () => {
         <div class="space-y-6">
             <div>
                 <h1 class="text-3xl font-semibold text-white">Staff logins</h1>
-                <p class="mt-1 text-slate-400">Super admin can create simple shop staff accounts.</p>
+                <p class="mt-1 text-slate-400">Super admin can create shop staff and assign them to one or more teams.</p>
             </div>
 
             <form class="grid gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 md:grid-cols-4" @submit.prevent="submit">
@@ -59,11 +64,22 @@ const submit = () => {
                         class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-amber-400 focus:outline-none"
                     />
                 </div>
-                <div class="flex items-end">
+                <div>
+                    <label class="mb-1.5 block text-sm text-slate-300">Teams</label>
+                    <select
+                        v-model="form.team_ids"
+                        multiple
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-amber-400 focus:outline-none"
+                    >
+                        <option v-for="team in teams" :key="team.id" :value="team.id">{{ team.name }}</option>
+                    </select>
+                    <p class="mt-1 text-xs text-slate-500">Leave empty to assign the currently selected shop.</p>
+                </div>
+                <div class="flex items-end md:col-span-4">
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:opacity-50"
+                        class="rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:opacity-50"
                     >
                         Add staff login
                     </button>
@@ -80,6 +96,7 @@ const submit = () => {
                             <th class="px-4 py-3 font-medium">Name</th>
                             <th class="px-4 py-3 font-medium">Email</th>
                             <th class="px-4 py-3 font-medium">Access</th>
+                            <th class="px-4 py-3 font-medium">Teams</th>
                             <th class="px-4 py-3 font-medium text-right">Actions</th>
                         </tr>
                     </thead>
@@ -94,6 +111,9 @@ const submit = () => {
                                 >
                                     {{ account.is_platform_admin ? 'Super admin' : 'Staff' }}
                                 </span>
+                            </td>
+                            <td class="px-4 py-3 text-slate-300">
+                                {{ account.is_platform_admin ? 'All shops' : (account.teams || []).map((team) => team.name).join(', ') || '—' }}
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <ConfirmDelete

@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\BillController;
 use App\Http\Controllers\Api\V1\BikeController;
+use App\Http\Controllers\Api\V1\BillController;
 use App\Http\Controllers\Api\V1\Customer\AuthController as CustomerAuthController;
 use App\Http\Controllers\Api\V1\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\ServiceRecordController;
+use App\Http\Controllers\CurrentTeamController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -18,9 +19,10 @@ Route::prefix('v1')->group(function () {
     Route::post('customer/auth/verify-otp', [CustomerAuthController::class, 'verifyOtp'])
         ->middleware('throttle:10,1');
 
-    Route::middleware(['auth:sanctum', 'staff'])->group(function () {
+    Route::middleware(['auth:sanctum', 'staff', 'current-team'])->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('auth/user', [AuthController::class, 'user']);
+        Route::put('current-team', [CurrentTeamController::class, 'update']);
 
         Route::get('dashboard', DashboardController::class);
 

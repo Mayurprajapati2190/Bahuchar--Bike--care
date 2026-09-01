@@ -3,6 +3,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import AppLogo from '@/Components/AppLogo.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
+import TeamSwitcher from '@/Components/TeamSwitcher.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -23,6 +24,7 @@ const navItems = computed(() => {
 
     if (isSuperAdmin.value) {
         items.push(
+            { name: 'Teams', href: '/teams', icon: '🏷' },
             { name: 'Staff', href: '/staff', icon: '🛡' },
             { name: 'Backups', href: '/backups', icon: '💾' },
         );
@@ -50,49 +52,54 @@ const formatCurrency = (value) =>
         <div class="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-slate-950 to-slate-950" />
 
         <div class="relative flex min-h-screen">
-            <aside class="hidden w-72 shrink-0 border-r border-slate-800/80 bg-slate-900/90 backdrop-blur md:block">
-                <div class="border-b border-slate-800 px-6 py-6">
+            <aside class="hidden w-72 shrink-0 flex-col border-r border-slate-800/80 bg-slate-900/90 backdrop-blur md:flex md:min-h-screen">
+                <div class="shrink-0 border-b border-slate-800 px-6 py-6">
                     <AppLogo />
                     <p class="mt-4 text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">Bahuchar Bike Care</p>
                     <p class="mt-1 text-xl font-bold text-white">Garage Manager</p>
+                    <div class="mt-4">
+                        <TeamSwitcher />
+                    </div>
                     <p v-if="messagingFreeMode" class="mt-2 text-xs text-sky-400">Messaging · free mode</p>
                 </div>
 
-                <nav class="space-y-1 px-3 py-4">
-                    <Link
-                        v-for="item in navItems"
-                        :key="item.href"
-                        :href="item.href"
-                        class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition"
-                        :class="
-                            isActive(item.href)
-                                ? 'bg-amber-400/15 text-amber-200 shadow-inner shadow-amber-400/5'
-                                : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
-                        "
-                    >
-                        <span class="flex items-center gap-3">
-                            <span class="text-base opacity-80">{{ item.icon }}</span>
-                            {{ item.name }}
-                        </span>
-                        <span
-                            v-if="item.badge && pending.count > 0"
-                            class="rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white"
+                <div class="flex-1 overflow-y-auto">
+                    <nav class="space-y-1 px-3 py-4">
+                        <Link
+                            v-for="item in navItems"
+                            :key="item.href"
+                            :href="item.href"
+                            class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition"
+                            :class="
+                                isActive(item.href)
+                                    ? 'bg-amber-400/15 text-amber-200 shadow-inner shadow-amber-400/5'
+                                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                            "
                         >
-                            {{ pending.count }}
-                        </span>
-                    </Link>
-                </nav>
+                            <span class="flex items-center gap-3">
+                                <span class="text-base opacity-80">{{ item.icon }}</span>
+                                {{ item.name }}
+                            </span>
+                            <span
+                                v-if="item.badge && pending.count > 0"
+                                class="rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white"
+                            >
+                                {{ pending.count }}
+                            </span>
+                        </Link>
+                    </nav>
 
-                <div v-if="pending.count > 0" class="mx-3 mb-4 rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-red-300">Pending Payments</p>
-                    <p class="mt-1 text-lg font-bold text-white">{{ formatCurrency(pending.amount) }}</p>
-                    <p class="mt-1 text-xs text-slate-400">{{ pending.count }} bill(s) awaiting payment</p>
-                    <Link href="/bills/pending/list" class="mt-3 inline-block text-xs font-medium text-amber-400 hover:text-amber-300">
-                        View all →
-                    </Link>
+                    <div v-if="pending.count > 0" class="mx-3 mb-4 rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+                        <p class="text-xs font-medium uppercase tracking-wide text-red-300">Pending Payments</p>
+                        <p class="mt-1 text-lg font-bold text-white">{{ formatCurrency(pending.amount) }}</p>
+                        <p class="mt-1 text-xs text-slate-400">{{ pending.count }} bill(s) awaiting payment</p>
+                        <Link href="/bills/pending/list" class="mt-3 inline-block text-xs font-medium text-amber-400 hover:text-amber-300">
+                            View all →
+                        </Link>
+                    </div>
                 </div>
 
-                <div class="absolute bottom-0 w-72 border-t border-slate-800 px-4 py-4">
+                <div class="shrink-0 border-t border-slate-800 px-4 py-4">
                     <p class="truncate text-sm font-medium text-white">{{ user?.name }}</p>
                     <p class="truncate text-xs text-amber-400">{{ isSuperAdmin ? 'Super admin' : 'Staff' }}</p>
                     <p class="truncate text-xs text-slate-400">{{ user?.email }}</p>
@@ -119,6 +126,9 @@ const formatCurrency = (value) =>
                         <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm" @click="router.post('/logout')">
                             Log out
                         </button>
+                    </div>
+                    <div class="px-4 pb-3">
+                        <TeamSwitcher />
                     </div>
                     <nav class="flex gap-1 overflow-x-auto px-4 pb-3">
                         <Link
@@ -147,10 +157,3 @@ const formatCurrency = (value) =>
         </div>
     </div>
 </template>
-
-<style scoped>
-aside {
-    position: relative;
-    min-height: 100vh;
-}
-</style>

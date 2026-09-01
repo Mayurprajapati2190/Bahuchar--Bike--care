@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\BillResource;
 use App\Http\Resources\BikeResource;
+use App\Http\Resources\BillResource;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\ServiceRecordResource;
 use App\Models\Bill;
@@ -60,7 +60,7 @@ class ProfileController extends Controller
 
         return response()->json([
             'next_service' => $nextDue ? new ServiceRecordResource($nextDue) : null,
-            'shop' => config('shop'),
+            'shop' => $request->user()->team?->shopPayload() ?? config('shop'),
         ]);
     }
 }

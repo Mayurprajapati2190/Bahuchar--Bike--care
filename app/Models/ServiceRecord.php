@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTeam;
 use Database\Factories\ServiceRecordFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
+    'team_id',
     'customer_id',
     'bike_id',
     'created_by',
@@ -28,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class ServiceRecord extends Model
 {
     /** @use HasFactory<ServiceRecordFactory> */
-    use HasFactory;
+    use BelongsToTeam, HasFactory;
 
     public const STATUS_IN_PROGRESS = 'in_progress';
 

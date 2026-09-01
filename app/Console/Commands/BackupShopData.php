@@ -18,6 +18,8 @@ class BackupShopData extends Command
      */
     private array $tables = [
         'users',
+        'teams',
+        'team_user',
         'customers',
         'bikes',
         'service_records',

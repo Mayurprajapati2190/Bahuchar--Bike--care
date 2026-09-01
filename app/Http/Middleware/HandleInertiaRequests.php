@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Bill;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,19 +37,31 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() ? [
-                    ...$request->user()->only([
+                'user' => fn () => $user ? [
+                    ...$user->only([
                         'id',
                         'name',
                         'email',
                         'role',
                         'is_platform_admin',
+                        'current_team_id',
                     ]),
-                    'is_super_admin' => $request->user()->isSuperAdmin(),
+                    'is_super_admin' => $user->isSuperAdmin(),
                 ] : null,
+            ],
+            'teams' => [
+                'current' => fn () => $this->currentTeamPayload($user),
+                'available' => fn () => $user
+                    ? $user->availableTeams()->map(fn ($team) => [
+                        'id' => $team->id,
+                        'name' => $team->name,
+                    ])->values()
+                    : collect(),
             ],
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
@@ -69,13 +82,30 @@ class HandleInertiaRequests extends Middleware
                 'emailLive' => config('mail.default') !== 'log',
                 'whatsappEnabled' => (bool) config('messaging.whatsapp.enabled'),
             ],
-            'shop' => fn () => [
+            'shop' => fn () => $user?->currentTeam?->shopPayload() ?? [
                 'name' => config('shop.name'),
                 'tagline' => config('shop.tagline'),
                 'address' => config('shop.address'),
                 'phone' => config('shop.phone'),
                 'hours' => config('shop.hours'),
             ],
+        ];
+    }
+
+    /**
+     * @return array{id: int, name: string}|null
+     */
+    private function currentTeamPayload(?User $user): ?array
+    {
+        $currentTeam = $user?->currentTeam;
+
+        if (! $currentTeam) {
+            return null;
+        }
+
+        return [
+            'id' => $currentTeam->id,
+            'name' => $currentTeam->name,
         ];
     }
 }

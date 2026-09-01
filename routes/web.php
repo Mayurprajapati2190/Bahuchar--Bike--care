@@ -1,13 +1,15 @@
 <?php
 
 use App\Http\Controllers\BackupController;
-use App\Http\Controllers\BillController;
 use App\Http\Controllers\BikeController;
+use App\Http\Controllers\BillController;
+use App\Http\Controllers\CurrentTeamController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\ServiceRecordController;
 use App\Http\Controllers\StaffUserController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MarketingController::class, 'home'])->name('home');
@@ -17,6 +19,7 @@ Route::get('/contact', [MarketingController::class, 'contact'])->name('marketing
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::put('/current-team', [CurrentTeamController::class, 'update'])->name('current-team.update');
 
     Route::get('/bills', [BillController::class, 'index'])->name('bills.index');
     Route::get('/bills/pending/list', [BillController::class, 'pending'])->name('bills.pending');
@@ -36,6 +39,11 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'super-admin'])->group(function () {
+    Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+    Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+    Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+    Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.destroy');
+
     Route::get('/staff', [StaffUserController::class, 'index'])->name('staff.index');
     Route::post('/staff', [StaffUserController::class, 'store'])->name('staff.store');
     Route::delete('/staff/{user}', [StaffUserController::class, 'destroy'])->name('staff.destroy');

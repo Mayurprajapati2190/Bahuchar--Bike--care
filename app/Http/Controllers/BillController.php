@@ -7,10 +7,12 @@ use App\Models\Bill;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class BillController extends Controller
 {
-    public function index(Request $request): \Inertia\Response
+    public function index(Request $request): Response
     {
         $search = $request->string('search')->trim()->toString();
         $payment = $request->string('payment')->trim()->toString();
@@ -32,7 +34,7 @@ class BillController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return \Inertia\Inertia::render('Bills/Index', [
+        return Inertia::render('Bills/Index', [
             'bills' => $bills,
             'filters' => [
                 'search' => $search,
@@ -48,14 +50,14 @@ class BillController extends Controller
         ]);
     }
 
-    public function pending(Request $request): \Inertia\Response
+    public function pending(Request $request): Response
     {
         $request->merge(['payment' => 'pending']);
 
         return $this->index($request);
     }
 
-    public function show(Bill $bill): \Inertia\Response
+    public function show(Bill $bill): Response
     {
         $bill->load([
             'serviceRecord.customer',
@@ -64,9 +66,9 @@ class BillController extends Controller
             'serviceRecord.creator',
         ]);
 
-        return \Inertia\Inertia::render('Bills/Show', [
+        return Inertia::render('Bills/Show', [
             'bill' => $bill,
-            'shop' => config('shop'),
+            'shop' => $this->shopPayload(),
         ]);
     }
 
@@ -80,7 +82,7 @@ class BillController extends Controller
 
         return view('bills.print', [
             'bill' => $bill,
-            'shop' => config('shop'),
+            'shop' => $this->shopPayload(),
         ]);
     }
 

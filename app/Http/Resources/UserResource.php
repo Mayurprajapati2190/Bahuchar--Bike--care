@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\User */
+/** @mixin User */
 class UserResource extends JsonResource
 {
     /**
@@ -19,6 +20,9 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'role' => $this->role,
             'is_super_admin' => $this->isSuperAdmin(),
+            'current_team_id' => $this->current_team_id,
+            'current_team' => $this->whenLoaded('currentTeam', fn () => new TeamResource($this->currentTeam)),
+            'teams' => TeamResource::collection($this->whenLoaded('teams')),
         ];
     }
 }

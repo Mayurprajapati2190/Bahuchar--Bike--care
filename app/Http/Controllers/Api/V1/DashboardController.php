@@ -81,7 +81,7 @@ class DashboardController extends Controller
             'upcoming_reminders' => ServiceRecordResource::collection($upcomingReminders),
             'pending_payments' => BillResource::collection($pendingPayments),
             'recent_sms' => SmsMessageResource::collection($recentSms),
-            'shop' => config('shop'),
+            'shop' => $this->shopPayload(),
         ]);
     }
 }

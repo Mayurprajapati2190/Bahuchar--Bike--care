@@ -31,7 +31,7 @@ class BillGenerator
 
             $bill = Bill::query()->create([
                 'service_record_id' => $service->id,
-                'bill_number' => $this->nextBillNumber(),
+                'bill_number' => $this->nextBillNumber($service),
                 'bill_date' => $service->completed_at?->toDateString() ?? now()->toDateString(),
                 'subtotal' => $subtotal,
                 'tax_amount' => 0,
@@ -48,9 +48,10 @@ class BillGenerator
         });
     }
 
-    public function nextBillNumber(): string
+    public function nextBillNumber(?ServiceRecord $service = null): string
     {
-        $prefix = config('shop.bill_prefix', 'BBC');
+        $service?->loadMissing('team');
+        $prefix = $service?->team?->bill_prefix ?: config('shop.bill_prefix', 'BBC');
         $yearMonth = now()->format('Ym');
 
         $latest = Bill::query()
