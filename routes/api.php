@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\V1\Customer\ProfileController as CustomerProfileCon
 use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\ServiceRecordController;
+use App\Http\Controllers\Api\V1\StaffUserController;
+use App\Http\Controllers\Api\V1\TeamController;
 use App\Http\Controllers\CurrentTeamController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +50,17 @@ Route::prefix('v1')->group(function () {
         Route::get('bills/{bill}/print', [BillController::class, 'print']);
         Route::patch('bills/{bill}/payment', [BillController::class, 'updatePayment']);
         Route::delete('bills/{bill}', [BillController::class, 'destroy']);
+    });
+
+    Route::middleware(['auth:sanctum', 'staff', 'current-team', 'super-admin'])->group(function () {
+        Route::get('teams', [TeamController::class, 'index']);
+        Route::post('teams', [TeamController::class, 'store']);
+        Route::put('teams/{team}', [TeamController::class, 'update']);
+        Route::delete('teams/{team}', [TeamController::class, 'destroy']);
+
+        Route::get('staff-users', [StaffUserController::class, 'index']);
+        Route::post('staff-users', [StaffUserController::class, 'store']);
+        Route::delete('staff-users/{user}', [StaffUserController::class, 'destroy']);
     });
 
     Route::middleware(['auth:sanctum', 'customer'])->prefix('customer')->group(function () {
