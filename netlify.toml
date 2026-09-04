@@ -1,0 +1,11 @@
+# This project cannot be hosted on Netlify.
+#
+# Bahuchar Bike Care is a Laravel (PHP) + MySQL app.
+# Netlify only serves static sites and expects a `dist` folder.
+# Vite in this repo builds to `public/build`, and pages still need PHP.
+#
+# See: deploy/DEPLOYMENT.md
+
+[build]
+  command = "echo 'ERROR: This is a Laravel PHP app. Deploy to a VPS/PHP host — see deploy/DEPLOYMENT.md' && exit 1"
+  publish = "public"

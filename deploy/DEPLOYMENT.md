@@ -1,13 +1,34 @@
 # Bahuchar Bike Care — Production Deployment Guide
 
-This guide covers deploying the Laravel application to a Linux VPS with Nginx, MySQL, queue workers, scheduled SMS reminders, and HTTPS.
+This is a **Laravel + Inertia + Vue** application. It needs **PHP 8.3+, MySQL, Nginx, queue workers, and a cron scheduler**.
+
+## Do NOT use Netlify (or similar static hosts)
+
+Netlify only serves static files. This app’s `npm run build` writes assets to `public/build` (not `dist`) and still requires Laravel to serve pages and the API.
+
+If you deploy on Netlify you will see errors like:
+
+> Deploy directory `dist` does not exist
+
+That is expected. Use a **PHP VPS** (or Laravel Cloud / Forge / similar) instead. Follow this guide.
+
+Ready-made files in this folder:
+
+| File | Purpose |
+|------|---------|
+| `.env.production.example` | Production environment template |
+| `nginx.conf` | Nginx site config |
+| `supervisor-worker.conf` | Queue worker via Supervisor |
+| `deploy.sh` | One-command update on the server |
+
+---
 
 ## Requirements
 
 - Ubuntu 22.04+ or similar Linux VPS
-- PHP 8.3+ with extensions: `bcmath`, `ctype`, `curl`, `dom`, `fileinfo`, `json`, `mbstring`, `openssl`, `pdo`, `pdo_mysql`, `tokenizer`, `xml`
+- PHP 8.3+ with extensions: `bcmath`, `ctype`, `curl`, `dom`, `fileinfo`, `json`, `mbstring`, `openssl`, `pdo`, `pdo_mysql`, `tokenizer`, `xml`, `zip`
 - MySQL 8+
-- Node.js 20+ (build assets locally or on server)
+- Node.js 20+ (build assets on the server or CI)
 - Composer 2
 - Nginx
 - Supervisor
@@ -18,7 +39,11 @@ This guide covers deploying the Laravel application to a Linux VPS with Nginx, M
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-xml php8.3-mbstring php8.3-curl php8.3-zip php8.3-bcmath unzip git supervisor certbot python3-certbot-nginx
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
 ```
+
+Install Composer if needed: https://getcomposer.org/download/
 
 ## 2. Database
 
@@ -38,35 +63,11 @@ cd /var/www/bahuchar-bike-care
 
 git clone <your-repo-url> .
 composer install --no-dev --optimize-autoloader
-cp .env.example .env
+cp deploy/.env.production.example .env
 php artisan key:generate
 ```
 
-Edit `.env`:
-
-```env
-APP_NAME="Bahuchar Bike Care"
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://yourdomain.com
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=bahuchar_bike_care
-DB_USERNAME=bahuchar
-DB_PASSWORD=your-strong-password
-
-QUEUE_CONNECTION=database
-SESSION_DRIVER=database
-CACHE_STORE=database
-
-MSG91_ENABLED=true
-MSG91_AUTH_KEY=your-msg91-auth-key
-MSG91_CONFIRMATION_TEMPLATE_ID=your-dlt-template-id
-MSG91_REMINDER_TEMPLATE_ID=your-dlt-template-id
-MSG91_SHOP_PHONE="+91 XXXXX XXXXX"
-```
+Edit `.env` — set `APP_URL`, database password, mail, and MSG91 if needed.
 
 Build frontend and run migrations:
 
@@ -74,54 +75,25 @@ Build frontend and run migrations:
 npm ci && npm run build
 php artisan migrate --force
 php artisan db:seed --class=AdminUserSeeder --force
-php artisan config:cache
-php artisan route:cache
+php artisan optimize
 php artisan view:cache
+php artisan storage:link --force
 sudo chown -R www-data:www-data storage bootstrap/cache
 sudo chmod -R 775 storage bootstrap/cache
 ```
 
-## 4. Nginx configuration
-
-Create `/etc/nginx/sites-available/bahuchar-bike-care`:
-
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-    root /var/www/bahuchar-bike-care/public;
-
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-
-    index index.php;
-    charset utf-8;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    error_page 404 /index.php;
-
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-        fastcgi_hide_header X-Powered-By;
-    }
-
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-}
-```
-
-Enable site and SSL:
+Or after the first setup, use:
 
 ```bash
+chmod +x deploy/deploy.sh
+./deploy/deploy.sh
+```
+
+## 4. Nginx configuration
+
+```bash
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/bahuchar-bike-care
+sudo nano /etc/nginx/sites-available/bahuchar-bike-care   # set yourdomain.com
 sudo ln -s /etc/nginx/sites-available/bahuchar-bike-care /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d yourdomain.com
@@ -129,24 +101,8 @@ sudo certbot --nginx -d yourdomain.com
 
 ## 5. Queue worker (Supervisor)
 
-Create `/etc/supervisor/conf.d/bahuchar-worker.conf`:
-
-```ini
-[program:bahuchar-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/bahuchar-bike-care/artisan queue:work database --sleep=3 --tries=3 --max-time=3600
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=www-data
-numprocs=1
-redirect_stderr=true
-stdout_logfile=/var/www/bahuchar-bike-care/storage/logs/worker.log
-stopwaitsecs=3600
-```
-
 ```bash
+sudo cp deploy/supervisor-worker.conf /etc/supervisor/conf.d/bahuchar-worker.conf
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl start bahuchar-worker:*
@@ -154,7 +110,7 @@ sudo supervisorctl start bahuchar-worker:*
 
 ## 6. Laravel scheduler (cron)
 
-SMS reminders run daily at 9:00 AM IST via `services:send-reminders`.
+SMS reminders run daily at 9:00 AM IST. Backups run monthly.
 
 ```bash
 sudo crontab -u www-data -e
@@ -166,13 +122,13 @@ Add:
 * * * * * cd /var/www/bahuchar-bike-care && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-Verify scheduler:
+Verify:
 
 ```bash
 php artisan schedule:list
 ```
 
-## 7. Database backups
+## 7. Database backups (optional extra)
 
 Create `/usr/local/bin/backup-bahuchar-db.sh`:
 
@@ -201,23 +157,29 @@ Laravel exposes `/up` for uptime monitoring. Configure [UptimeRobot](https://upt
 
 ## 9. Post-deploy smoke test
 
-1. Log in at `https://yourdomain.com/login`
-2. Create a customer with a valid 10-digit mobile number
-3. Add a bike and create a service record
-4. Click **Complete & Send SMS** — verify SMS log entry (and actual SMS if MSG91 is enabled)
-5. Run `php artisan services:send-reminders` manually to test reminder queue
-6. Install PWA on mobile via browser **Add to Home Screen**
+1. Open `https://yourdomain.com/up` — should return OK
+2. Log in at `https://yourdomain.com/login`
+3. Create a customer with a valid 10-digit mobile number
+4. Add a bike and create a service record
+5. Click **Complete & Send SMS** — verify SMS log (and real SMS if MSG91 is enabled)
+6. Run `php artisan services:send-reminders` manually to test reminder queue
+7. Install PWA on mobile via browser **Add to Home Screen**
 
 ## 10. Updating the app
 
 ```bash
 cd /var/www/bahuchar-bike-care
+./deploy/deploy.sh
+```
+
+Or manually:
+
+```bash
 git pull origin main
 composer install --no-dev --optimize-autoloader
 npm ci && npm run build
 php artisan migrate --force
-php artisan config:cache
-php artisan route:cache
+php artisan optimize
 php artisan view:cache
 sudo supervisorctl restart bahuchar-worker:*
 ```
@@ -230,17 +192,15 @@ The Laravel backend exposes a REST API at `/api/v1/` for native Android apps (st
 
 - **HTTPS** required for Play Store release builds
 - **Sanctum** token auth — run migrations including `personal_access_tokens` and `customer_otps`
-- **Queue worker** must run for SMS (unchanged)
-- Clear route cache after deploy: `php artisan route:clear && php artisan route:cache`
+- **Queue worker** must run for SMS
+- Clear route cache after deploy: `php artisan optimize`
 
 ### Environment variables
 
 ```env
 SANCTUM_TOKEN_EXPIRATION=43200
-CORS_ALLOWED_ORIGINS=*
+CORS_ALLOWED_ORIGINS=https://yourdomain.com
 ```
-
-Restrict `CORS_ALLOWED_ORIGINS` in production if needed.
 
 ### Staff API auth
 
@@ -262,3 +222,16 @@ Phone must belong to an existing customer. In free SMS mode, OTP is logged to `s
 ### Android build
 
 See [mobile/README.md](../mobile/README.md) for Android Studio setup, API base URL, and Play Store signing.
+
+## 12. Production environment checklist
+
+- [ ] `APP_ENV=production`
+- [ ] `APP_DEBUG=false`
+- [ ] `APP_URL=https://yourdomain.com`
+- [ ] `SESSION_SECURE_COOKIE=true`
+- [ ] `SESSION_ENCRYPT=true`
+- [ ] `QUEUE_CONNECTION=database` + Supervisor worker running
+- [ ] Cron for `schedule:run`
+- [ ] SSL via Certbot
+- [ ] `npm run build` completed (`public/build` present)
+- [ ] `/up` returns 200

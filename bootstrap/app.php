@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust reverse proxies (Nginx, Cloudflare, load balancers) so HTTPS
+        // and client IPs resolve correctly in production.
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             EnsureCurrentTeam::class,
             HandleInertiaRequests::class,
