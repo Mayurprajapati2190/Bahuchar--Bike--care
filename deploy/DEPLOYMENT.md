@@ -1,24 +1,35 @@
 # Bahuchar Bike Care — Production Deployment Guide
 
+**New here?** Open **[START_HERE.md](START_HERE.md)** first.
+
+Host quick guides:
+
+- [Hostinger VPS](HOSTINGER.md)
+- [DigitalOcean](DIGITALOCEAN.md)
+- [cPanel shared](CPANEL.md)
+
 This is a **Laravel + Inertia + Vue** application. It needs **PHP 8.3+, MySQL, Nginx, queue workers, and a cron scheduler**.
 
-## Do NOT use Netlify (or similar static hosts)
+## Do NOT use Netlify, Vercel, or similar static hosts
 
-Netlify only serves static files. This app’s `npm run build` writes assets to `public/build` (not `dist`) and still requires Laravel to serve pages and the API.
+Netlify and Vercel are for static / Node frontends. This app is **Laravel (PHP) + MySQL**.
 
-If you deploy on Netlify you will see errors like:
+- `npm run build` only creates assets in `public/build`
+- Pages, login, API, SMS, and queues still need PHP running on a server
 
-> Deploy directory `dist` does not exist
+If you connect this repo to those platforms you will see intentional fail messages from `netlify.toml` / `vercel.json`. That is expected.
 
-That is expected. Use a **PHP VPS** (or Laravel Cloud / Forge / similar) instead. Follow this guide.
+**Use a PHP VPS** (or Laravel Cloud / Forge / similar) instead. Follow this guide.
 
 Ready-made files in this folder:
 
 | File | Purpose |
 |------|---------|
+| `START_HERE.md` | Pick your host and start |
 | `.env.production.example` | Production environment template |
 | `nginx.conf` | Nginx site config |
 | `supervisor-worker.conf` | Queue worker via Supervisor |
+| `bootstrap-server.sh` | First-time Ubuntu software install |
 | `deploy.sh` | One-command update on the server |
 
 ---

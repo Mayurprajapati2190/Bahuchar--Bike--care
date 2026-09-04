@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "echo \"ERROR: This is a Laravel PHP + MySQL app. Vercel cannot host it. Deploy to a VPS/PHP host — see deploy/DEPLOYMENT.md\" && exit 1",
+  "installCommand": "echo \"Skipping install — wrong platform (see deploy/DEPLOYMENT.md)\" && exit 1",
+  "framework": null,
+  "outputDirectory": "public"
+}
