@@ -5,9 +5,8 @@
 | Host | Why it fails |
 |------|----------------|
 | Netlify | Static only — no PHP/MySQL |
-| Vercel | Node/static — no Laravel server |
 
-Disconnect those sites. Do not keep redeploying this repo there.
+Disconnect Netlify. Do not keep redeploying this repo there.
 
 ## Correct hosts (pick one)
 
@@ -17,6 +16,7 @@ Disconnect those sites. Do not keep redeploying this repo there.
 | DigitalOcean Droplet | [DIGITALOCEAN.md](DIGITALOCEAN.md) |
 | cPanel shared hosting | [CPANEL.md](CPANEL.md) |
 | Any Ubuntu VPS (full detail) | [DEPLOYMENT.md](DEPLOYMENT.md) |
+| Vercel (free container) | [DEPLOYMENT.md](DEPLOYMENT.md) — Vercel section |
 
 ## Fastest path (recommended)
 

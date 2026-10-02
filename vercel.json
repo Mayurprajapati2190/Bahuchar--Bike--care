@@ -1,7 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "echo \"ERROR: This is a Laravel PHP + MySQL app. Vercel cannot host it. Deploy to a VPS/PHP host — see deploy/DEPLOYMENT.md\" && exit 1",
-  "installCommand": "echo \"Skipping install — wrong platform (see deploy/DEPLOYMENT.md)\" && exit 1",
-  "framework": null,
-  "outputDirectory": "public"
+  "services": {
+    "app": {
+      "root": ".",
+      "entrypoint": "Dockerfile.vercel",
+      "runtime": "container"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": { "service": "app" } }
+  ],
+  "crons": [
+    {
+      "path": "/cron/reminders",
+      "schedule": "30 3 * * *"
+    }
+  ]
 }

@@ -10,16 +10,37 @@ Host quick guides:
 
 This is a **Laravel + Inertia + Vue** application. It needs **PHP 8.3+, MySQL, Nginx, queue workers, and a cron scheduler**.
 
-## Do NOT use Netlify, Vercel, or similar static hosts
+## Do NOT use Netlify
 
-Netlify and Vercel are for static / Node frontends. This app is **Laravel (PHP) + MySQL**.
+Netlify only serves static files. This app is **Laravel (PHP) + MySQL**. `netlify.toml` fails the build on purpose.
 
-- `npm run build` only creates assets in `public/build`
-- Pages, login, API, SMS, and queues still need PHP running on a server
+## Vercel
 
-If you connect this repo to those platforms you will see intentional fail messages from `netlify.toml` / `vercel.json`. That is expected.
+Vercel builds `Dockerfile.vercel` (FrankenPHP) and routes every request to Laravel. Push to `main` to redeploy.
 
-**Use a PHP VPS** (or Laravel Cloud / Forge / similar) instead. Follow this guide.
+In the Vercel project, clear any overridden **Install Command** or **Build Command** left from the old setup. The old command was `echo "Skipping install…" && exit 1`.
+
+Set these environment variables, then redeploy:
+
+| Name | Value |
+|------|--------|
+| `APP_KEY` | Copy from your local `.env` (`php artisan key:generate --show`) |
+| `APP_URL` | Your Vercel URL, including `https://` |
+| `DB_CONNECTION` | `mysql` |
+| `DB_HOST` | Public MySQL host (not `127.0.0.1`) |
+| `DB_PORT` | `3306` |
+| `DB_DATABASE` | Database name |
+| `DB_USERNAME` | Database user |
+| `DB_PASSWORD` | Database password |
+| `CRON_SECRET` | Long random string. Vercel sends it to `/cron/reminders` daily at 09:00 IST |
+
+Run migrations once from your PC against that same database:
+
+```bash
+php artisan migrate --force
+```
+
+Vercel has no disk that keeps files, and no always-on queue worker. Jobs run during the request (`QUEUE_CONNECTION=sync`). Shop backups stored on local disk will not survive. A VPS is the better host when you need a queue worker and file backups.
 
 Ready-made files in this folder:
 

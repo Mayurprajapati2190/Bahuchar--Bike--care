@@ -10,9 +10,22 @@ use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\ServiceRecordController;
 use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\TeamController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MarketingController::class, 'home'])->name('home');
+
+Route::get('/cron/reminders', function () {
+    $secret = (string) config('app.cron_secret');
+    $token = (string) request()->bearerToken();
+
+    abort_unless($secret !== '' && hash_equals($secret, $token), 403);
+
+    Artisan::call('services:send-reminders');
+
+    return response(Artisan::output(), 200, ['Content-Type' => 'text/plain']);
+})->name('cron.reminders');
+
 Route::get('/our-services', [MarketingController::class, 'services'])->name('marketing.services');
 Route::get('/why-us', [MarketingController::class, 'whyUs'])->name('marketing.why-us');
 Route::get('/contact', [MarketingController::class, 'contact'])->name('marketing.contact');
